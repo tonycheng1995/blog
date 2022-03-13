@@ -1,16 +1,16 @@
 title: 太极
 bio:  太极生两仪，两仪生四象
 baseurl: "/taiji"
-url: "https://codetiler.com"
+url: "https://blog.codetiler.com"
 repo: "taiji"                     #your_repo
-client_id: "xxxxxx" #your_clientID
-secret: "xxxxxxx"  #your_secrets
-owner: "codetiler"            #your_tonycheng1995
-admin: ["codetiler"]          #your_admin
+client_id: "14ddfd53200b04059607" #your_clientID
+secret: "693b6efa2874106e74d30317e72748c0837a2831"  #your_secrets
+owner: "tonycheng1995"            #your_tonycheng1995
+admin: ["tonycheng1995"]          #your_admin
 
 
-email: codetiler@foxmail.com
-github: codetiler
+email: tonycheng1995@foxmail.com
+github: tonycheng1995
 weibo:       #your_weiboID
 
 markdown: kramdown
