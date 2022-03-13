@@ -13,7 +13,8 @@
         owner: '{{site.owner}}',
         admin: '{{site.admin}}',
         id: md5(location.pathname),
-		proxy: '/github/login/oauth/access_token'
+		proxy: https://netnr-proxy.cloudno.de/https://github.com/login/oauth/access_token
+
     });
     gitalk.render('gitalk-container');
 </script>
