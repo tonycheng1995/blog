@@ -1,0 +1,28 @@
+title: 太极
+bio:  太极生两仪，两仪生四象
+baseurl: "/taiji"
+url: "https://codetiler.com"
+repo: "taiji"                     #your_repo
+client_id: "xxxxxx" #your_clientID
+secret: "xxxxxxx"  #your_secrets
+owner: "codetiler"            #your_tonycheng1995
+admin: ["codetiler"]          #your_admin
+
+
+email: codetiler@foxmail.com
+github: codetiler
+weibo:       #your_weiboID
+
+markdown: kramdown
+
+#分页
+paginate: 10
+paginate_path: "/posts/page:num/"
+
+plugins:
+  - jekyll-feed           #文章提要
+  - jekyll-sitemap        #站点地图
+  - jekyll-gist
+  - jekyll-email-protect  #邮件混淆
+  - jekyll-seo-tag        #seo
+  - jekyll-paginate      #分页
