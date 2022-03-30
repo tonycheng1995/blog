@@ -1,0 +1,542 @@
+---
+layout: post
+title: "Android之Handler"
+date:   2017-03-07 21:21:58 +0800
+toc: true
+category: Android
+tags: Android
+excerpt: 当我们进行一些下载或者其他类似耗时的操作时，如果把它放在主线程中，那么将会导致Activity的阻塞，长时间无响应，以致系统强制关闭。因此，我们需要把这些耗时的操作放到单独的子线程中。Handler提供异步处理的功能，使线程之间并行进行，互不影响。
+---
+#### Handler的两个主要作用：
+#### 1.调度messages和runnables在时间上的执行
+#### 2.把一个动作放到一个线程上执行
+#### 根本目的就是解决多线程并发的问题
+
+#### 下面我们来写一个例子来更新UI
+#### 新建布局文件activity_handler.xml
+{% highlight xml %}
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/activity_handler"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:paddingBottom="@dimen/activity_vertical_margin"
+android:paddingLeft="@dimen/activity_horizontal_margin"
+android:paddingRight="@dimen/activity_horizontal_margin"
+android:paddingTop="@dimen/activity_vertical_margin"
+tools:context="com.example.cheng.test.HandlerActivity">
+
+<TextView
+    android:id="@+id/textView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Hello World!"/>
+
+</LinearLayout>
+{% endhighlight xml %}
+
+#### 对应的我们修改HandlerActivity.java的代码，使它实现一秒后更新文本的功能
+{% highlight java %}
+package com.example.cheng.test;
+
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
+
+public class HandlerActivity extends AppCompatActivity {
+    private TextView textView;
+    private Handler handler=new Handler();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_handler);
+        textView=(TextView)findViewById(R.id.textView);
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);   
+                            textView.setText("更新文本数据");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+}
+{% endhighlight java %}
+
+#### 运行代码，可以看到程序报错‘只有创建视图层次结构的原始线程可以更改其视图’
+{% highlight bash %}
+android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
+{% endhighlight bash %}
+
+#### 我们修改HandlerActivity.java的代码
+{% highlight java %}
+package com.example.cheng.test;
+
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
+
+public class HandlerActivity extends AppCompatActivity {
+    private TextView textView;
+    private Handler handler=new Handler();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_handler);
+        textView=(TextView)findViewById(R.id.textView);
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                    handler.post(new Runnable() {   //将Runnable添加到消息队列
+                        @Override
+                        public void run() {
+                            textView.setText("更新文本数据");
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+}
+{% endhighlight java %}
+#### 运行程序，文本被成功的更改了
+
+#### 接下来我们利用Handler来做一个图片轮播
+#### 布局文件的代码
+{% highlight xml %}
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_handler"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.cheng.test.HandlerActivity">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
+{% endhighlight xml %}
+
+#### 编写java代码
+{% highlight java %}
+package com.example.cheng.test;
+
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+public class HandlerActivity extends AppCompatActivity {
+
+    private ImageView imageView;
+    private int images[]={R.drawable.img1,R.drawable.img2,R.drawable.img3};
+    private int index;
+    private MyRunnable myRunnale=new MyRunnable();
+    private Handler handler=new Handler();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_handler);
+        imageView=(ImageView)findViewById(R.id.imageView);
+        handler.postDelayed(myRunnale,1000);
+    }
+    class MyRunnable implements Runnable{
+        @Override
+        public void run() {
+            index++;
+            index=index%3;
+            imageView.setImageResource(images[index]);
+            handler.postDelayed(myRunnale,1000);    //将Runnable添加到线程队列中，并在指定时间后运行
+        }
+    }
+}
+{% endhighlight java %}
+    
+#### 这样一个轮播就做好，运行程序
+<img src="{{base.url}}/img/handler.gif" width="300px"/>
+
+
+方法|解释
+:---|:---
+post(Runnable)|将Runnable添加到消息队列，runnable将在handler所关联的线程上运行。如果Runnable成功放入到队列，则返回true，否则返回false，通常是因为looper正在退出处理消息队列。
+postAtTime(Runnable,long)|将Runnable添加到消息队列，并在指定的时间运行
+postDelayed(Runnable,long)|将Runnable添加到消息队列，并在指定时间后运行
+sendEmptyMessage(int what)|发送仅包含what值的消息
+sendMessage(Message)|将消息添加到消息队列挂起消息队列末尾，它将在handleMessage(Message)中被接收
+sendMessageAtTime(Message,long)|将消息在特定时间添加到消息队列挂起消息末尾
+sendMessageDelayed(Message,long)|将消息在特定时间后添加到消息队列挂起消息末尾
+removeCallbacks()|将Runnable从消息队列中删除，使线程停止运行
+obtainMessage()|从全局消息池中获取一个新的消息，比创建分配新的实例更高效
+msg.sendToTarget()|将消息发送到消息队列
+
+#### Message对象携带数据，通常用arg1，arg2来传递消息，还可以传递object对象
+#### MessageQueue就是一个消息队列，可以添加消息，并处理消息
+#### Looper内部包含了一个消息队列MessageQueue，所有的Handler发送的消息都走向这个消息队列。Loooper由系统来控制的循环，一个线程只能有有一个Looper对象。
+#### Looper.Looper方法是一个死循环，不断的从MessageQueue取消息，如果有消息就处理，如果没消息就阻塞
+#### Looper.prepare() 将当前线程初始化为looper。
+#### Looper.loop()在此线程中开始循环处理消息队列，一顶要调用quit()来结束循环
+#### Handler封装了消息的发送，内部会跟Looper进行关联，也就是说在Handler的内部可以找到Looper，找到Looper也就找到了MessageQueue，在Handler中发送消息，其实是向MessageQueue队列中发送消息
+#### Handler负责发送消息，Looper负责接收Handler发送的消息，并直接把消息回传给Handler自己，MessageQueue就是一个存储消息的容器
+
+#### 自定义的与线程相关的Handler
+{% highlight java %}
+package com.example.cheng.test;
+
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+
+public class Handler2Activity extends AppCompatActivity {
+
+    private Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            Log.i("UI---",""+Thread.currentThread());
+        }
+    };
+
+    private  MyThread thread;
+
+    class MyThread extends Thread{
+
+        public Handler handler;
+        @Override
+        public void run() {
+            Looper.prepare();   //将当前线程初始化为looper
+            handler=new Handler(){
+                @Override
+                public void handleMessage(Message msg) {
+                    Log.i("---------","currentThread"+Thread.currentThread());
+                }
+            };
+            Looper.loop();    //在此线程中开始循环处理消息队列
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_handler2);
+        thread=new MyThread();
+        thread.start();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        thread.handler.sendEmptyMessage(1);
+        handler.sendMessage(Message.obtain());  //将消息添加到消息队列挂起消息队列末尾，它将在handleMessage(Message)中被接收
+    }
+}
+{% endhighlight java %}
+
+####  HandlerThread解决多线程并发
+{% highlight java %}
+package com.example.cheng.test;
+
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+
+public class ThreadActivity extends AppCompatActivity {
+
+    private HandlerThread thread;
+    private Handler handler;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_thread);
+
+        thread=new HandlerThread("handler thread");
+        thread.start();
+        handler=new Handler(thread.getLooper()){
+            @Override
+            public void handleMessage(Message msg) {
+                Log.i("current thread----->",""+Thread.currentThread());//获取当前正在运行的线程
+            }
+        };
+        handler.sendMessage(Message.obtain());
+    }
+}
+{% endhighlight java %}
+#### 在主线程给子线程发送消息
+{% highlight java %}
+package com.example.cheng.test;
+
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+
+public class FourActivity extends AppCompatActivity implements View.OnClickListener{
+
+    //创建主线程的handler
+    private Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            Message message=new Message();
+            Log.i("----","Main Handler");
+            //向子线程发送信息
+            threadHandler.sendMessageDelayed(message,1000);
+        }
+    };
+
+    private Handler threadHandler;
+    private Button button1;
+    private Button button2;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_four);
+        button1=(Button)findViewById(R.id.button1);
+        button2=(Button)findViewById(R.id.button2);
+        button1.setOnClickListener(this);
+        button2.setOnClickListener(this);
+        HandlerThread thread=new HandlerThread("handlerThread");
+        thread.start();
+        //创建子线程的handler
+        threadHandler=new Handler(thread.getLooper()){
+            @Override
+            public void handleMessage(Message msg) {
+                Message message=new Message();
+                Log.i("------","thread Handler");
+                //向主线程发送信息
+                handler.sendMessageDelayed(message,1000);
+            }
+        };
+
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.button1:
+                handler.sendEmptyMessage(1);
+                break;
+            case R.id.button2:
+                handler.removeMessages(1);
+                break;
+            default:
+                break;
+        }
+    }
+}
+{% endhighlight java %}
+
+#### 更新UI的几种方法
+#### 第一种：handler.post
+{% highlight java %}
+package com.example.cheng.test;
+
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.TextView;
+
+public class FiveActivity extends AppCompatActivity {
+
+    private TextView textView;
+    private Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_five);
+
+        textView=(TextView)findViewById(R.id.textView);
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            textView.setText("文字已修改");
+                        }
+                    });
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+}
+{% endhighlight java %}
+
+#### 第二种：handler.sendMessage
+{% highlight java %}
+package com.example.cheng.test;
+
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.TextView;
+
+public class FiveActivity extends AppCompatActivity {
+
+    private TextView textView;
+    private Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            textView.setText("已修改");
+        }
+    };
+
+    private void handler2(){
+        handler.sendMessage(Message.obtain());
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_five);
+
+        textView=(TextView)findViewById(R.id.textView);
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+
+
+                    handler2();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+}
+{% endhighlight java %}
+
+#### 第三种：runOnUiThread
+{% highlight java %}
+package com.example.cheng.test;
+
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.TextView;
+
+public class FiveActivity extends AppCompatActivity {
+
+    private TextView textView;
+
+    private void updateUI(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textView.setText("文本已被修改");
+            }
+        });
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_five);
+
+        textView=(TextView)findViewById(R.id.textView);
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                    updateUI();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+}
+{% endhighlight java %}
+#### 第四种：view.post
+{% highlight java %}
+package com.example.cheng.test;
+
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.TextView;
+
+public class FiveActivity extends AppCompatActivity {
+
+    private TextView textView;
+
+    private void viewUI(){
+        textView.post(new Runnable() {
+            @Override
+            public void run() {
+                textView.setText("已修改文本");
+            }
+        });
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_five);
+
+        textView=(TextView)findViewById(R.id.textView);
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                    viewUI();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+}
+{% endhighlight java %}
+#### 补充
+#### 在非UI线程中可以更新UI，因为ViewRootImpl没有实例化时是不会check线程是否为主线程。

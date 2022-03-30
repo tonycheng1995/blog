@@ -1,0 +1,126 @@
+---
+layout: post
+title: "Git基本命令掌握"
+date:   2017-04-23 +0800
+toc: true
+category: Git
+tags: Git
+excerpt: 本篇文章主要总结Git使用中的基本命令
+---
+
+## 命令参数及作用
+
+| 命令 | 作用 |
+|:--------|:-------|
+|git init |创建初始化仓库。执行命令后，Git仓库会生成一个.git目录，该目录包含了资源的所有元数据（SVN会在每个子目录生成.svn目录，而Git只在仓库根目录生成.git） |
+|----
+|git clone|从仓库拷贝项目|
+|----
+|git add|将文件添加到缓存|
+|----
+|git status |查看项目当前状态|
+|----
+|git diff|尚未缓存的改动|
+|----
+|git diff --cached|查看已缓存的改动|
+|----
+|git diff HEAD |查看已缓存的与未缓存的所有改动|
+|----
+|git diff --stat|显示摘要而非整个diff|
+|----
+|git commit|将缓存区内容添加到仓库中，Git为你的每一个提交都记录你的名字与电子邮件地址|
+|----
+|git commit -a|跳过git add|
+|----
+|git commit -m "第一次提交"|提交注释|
+|----
+|git reset HEAD|取消已缓存的内容|
+|----
+|git reset --hard 25dbba5|项目版本回退到25dbba5|
+|----
+|git rm file|将条目从缓存区中移除|
+|----
+|git rm file|默认会将文件从缓存区和你的硬盘中删除|
+|----
+|git rm --cached|移除该文件，但保留工作区中的该文件|
+|----
+|git mv|重命名硬盘上的文件|
+|----
+|git branch test|创建分支test|
+|----
+|git checkout test|切换分支test|
+|----
+|git checkout -b test|创建并立即切换到test分支|
+|----
+|git branch|列出分支|
+|----
+|git branch -d test|删除test分支|
+|----
+|git merge test|合并分支,将test分支合并到主分支|
+|----
+|git log|列出历史提交记录|
+|----
+|git log --oneline|查看历史记录简洁版本|
+|----
+|git log --graph|查看分支历史|
+|----
+|git log --reverse|逆向显示所有日志|
+|----
+|git log --author=cheng|查看指定用户cheng的提交日志|
+|----
+|git log --no-merges|隐藏合并提交|
+|----
+|git log --before={3.weeks.ago}|查看3周前所有的提交|
+|----
+|git log --after={2017-03-03}|查看2017-03-03之后的所有提交|
+|----
+|git tag  v1.0|创建标签，不记录创建标签的时间、作者|
+|----
+|git tag -a v1.0|创建一个带注解的标签|
+|----
+|git log --decorate|查看标签|
+|----
+|git tag -a 85fc7e7|为85fc7e7追加标签|
+|----
+|git tag |查看所有标签|
+|----
+|git tag -m "标签信息" |指定标签信息|
+|----
+|git tag -d v1.1|删除标签|
+|----
+|git show v1.0|查看此版本修改的内容|
+|----
+|git remote add|添加远程仓库|
+|----
+|ssh-keygen -t rsa -C "cheng@163.com"|生成SSH Key|
+|----
+|get fetch|将远程主机的更新全部取回本地，默认取回所有分支更新|
+|----
+|get fetch origin master|取回origin主机的master分支|
+|=====
+{: rules="groups"}
+
+
+
+#### 1.配置用户名和邮箱地址
+    git config --global user.name 'cheng'
+    git config --global user.email cheng@163.com
+
+
+#### 2.重要命令实际操作
+    E:\> mkdir test
+    E:\> cd .\test\
+    E:\test> git init   #此时根目录下多了一个.git目录
+    E:\test [master +1 ~0 -0 !]> git add test.txt
+    E:\test [master +1 ~0 -0 ~]> git commit -a -m "第一次提交"
+    E:\test [master]> git remote add origin https://github.com/chengzequn/
+    test.git
+    E:\test [master]> git push origin master
+
+
+#### 这样一个项目就提交的github仓库了
+#### 3.如果项目有更新
+    E:\test [master]> echo "This is a test file2">test2.txt
+    E:\test [master +1 ~0 -0 !]> git add test2.txt
+    E:\test [master +1 ~0 -0 ~]> git commit -a -m "第二次提交"
+    E:\test [master]> git push origin master

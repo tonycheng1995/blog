@@ -209,6 +209,11 @@ body{
     font-size: 0.875em;
     text-indent:2em; /*开头空两格*/
 }
+
+.content img{
+    max-width: 100%;
+}
+
 /*---文章导航begin---*/
 .toc{
     border-right: 1px rgba(229,230,233,0.5) solid

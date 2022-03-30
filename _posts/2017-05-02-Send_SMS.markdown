@@ -1,0 +1,68 @@
+---
+layout: post
+title: "向用户推送短信信息"
+date:   2017-05-02 +0800
+toc: true
+category: SMS
+tags: SMS
+excerpt: 本篇文章主要讲解利用“阿里大于”向用户发送短信信息
+---
+#### [点击进入](https://www.alidayu.com/)官网，首次进入会送10元代金券
+#### 1.创建应用，应用名需要独一无二
+![]({{site.url}}/img/createcode01.png)
+#### 2.在设置里面可以查看App Key和App Secret，这两个值很重要后面会用到
+![]({{site.url}}/img/createcode02.png)
+![]({{site.url}}/img/createcode03.png)
+#### 3.配置短信签名和短信模板，在这里你可以根据你的需求编写不同的模板(只有通过审核后才能进行下面的操作)
+![]({{site.url}}/img/createcode04.png)
+#### 4.在测试里测试配置是否正确，是否可以正常发送信息
+![]({{site.url}}/img/createcode05.png)
+![]({{site.url}}/img/createcode06.png)
+#### 5.查看手机可以收到一条你发送的测试信息
+![]({{site.url}}/img/createcode07.png)
+#### 6.下载SDK
+![]({{site.url}}/img/createcode08.png)
+#### 7.编写代码程序
+{% highlight java %}
+public class CreadCode {
+	public static void main(String[] args) {
+		creadCode();
+	}
+	public static void creadCode(){
+		String url="http://gw.api.taobao.com/router/rest";
+		String appkey="23****26";																//App Key
+		String secret="5c5*************************ffa";				//secret
+		String code=creatRandom();															//随机验证码
+		String phone="15*****986";															//接收短信的手机号
+		String modelId="SMS_30****80";													//短信模板id
+		TaobaoClient client = new DefaultTaobaoClient(url, appkey, secret);
+		AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
+		req.setExtend("123456");																//这个参数没什么必要的
+		req.setSmsType("normal");																//模板类型
+		req.setSmsFreeSignName("芝麻课堂");											//你申请的签名
+		req.setSmsParamString("{\"code\":\""+code+"\"}");				//替换规则
+		req.setRecNum(phone);
+		req.setSmsTemplateCode(modelId);
+		AlibabaAliqinFcSmsNumSendResponse rsp = null;
+		try {
+			rsp = client.execute(req);
+		} catch (ApiException e) {
+
+			e.printStackTrace();
+		}
+		System.out.println(rsp.getBody());
+	}
+
+	//产生随机数作为验证码
+	public static String creatRandom(){
+		int i=(int) (Math.random()*1000000);
+		String code=String.valueOf(i);
+		System.out.println(code);
+		return code;
+	}
+
+}
+{% endhighlight java %}
+
+#### 8.运行程序后，就会像测试中一样向目标用户发送短信
+#### 更多需求可以查看[API文档](https://api.alidayu.com/doc2/apiDetail.htm?spm=a3142.8063008.3.1.Zkm0FQ&apiId=25450)

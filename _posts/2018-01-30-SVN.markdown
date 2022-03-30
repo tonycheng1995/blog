@@ -1,0 +1,47 @@
+---
+layout: post
+title:  "SVN使用操作"
+date:   2018-01-30  +0800
+toc: true
+category: SVN
+tags: SVN
+excerpt: 之前对Git有所了解，但是因为某些原因，特学习总结使用SVN。
+---
+## 下载
+#### 进入下载页下载安装程序，你也可以在下面下载相应的中文语言包。
+[SVN官网下载地址](https://tortoisesvn.net/downloads.html)
+![]({{site.url}}/img/SVN01.jpg)
+#### 运行TortoiseSVN-x.x.x.x-x64-svn-x.x.x.msi安装程序
+#### Next>Next>....>Finsh，安装完成。
+### 检出
+#### 填写项目库地址、本地工作路径，点击‘Ok’开始检出。(如果有权限，会弹出用户名、密码输入框)
+![]({{site.url}}/img/SVN02.jpg)
+#### 弹出详细信息对话框，检出完毕点击‘OK’。
+### 更新
+#### 当远程资源库有了修改后，需要同步本地与资源库的内容。右键>SVN Update,弹出详细信息对话框。
+### 提交
+#### 当本地做了修改需要保存到远程资源库。右键>SVN Commit,弹出对话框，填写备注及选择要提交的内容，点击‘OK’。弹出提交信息对话框。
+
+## Subclipse
+### 安装
+#### Help>marketPlace,搜索‘subclipse’,安装完毕需要重启Eclipse。
+![]({{site.url}}/img/SVN03.jpg)
+### 检出
+#### Import..>从SVN检出项目>创建新的资源库位置>输入SVN仓库地址>选择工程文件夹>Finsh完成导出。
+### 更新与提交
+#### 右键项目>Team>与资源库同步(S)
+![]({{site.url}}/img/SVN04.png)
+#### 蓝色箭头：表明仓库内容做了更改，可以更新到本地。
+#### 灰色箭头：本地做了修改，可以提交到远程仓库。
+#### 红色箭头：多人修改，出现冲突。
+### 解决冲突
+#### 双击冲突的文件，修改本地文件与远程文件有冲突的地方，保存。
+#### 右键要更新的文件>更新
+#### 右键要提交的文件>提交
+
+### 问题
+#### 1.重命名后不允许提交
+svn: Cannot commit 'D:\1.txt'
+because it was moved from 'D:\2.txt'
+which is not part of the commit; both sides of the move must be committed together
+#### 连同外部文件夹一起提交

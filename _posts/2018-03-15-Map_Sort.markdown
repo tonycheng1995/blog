@@ -1,0 +1,48 @@
+---
+layout: post
+title:  "Map按Key和Value排序"
+date:   2018-03-15  +0800
+toc: true
+category: Java
+tags: Java
+excerpt: 如果想要对Map的key升序排序，那么可以用TreeMap,如果希望Map按Key降序排序，或者按Value排序,那么就需要修改TreeMap的排序方式来实现。
+---
+
+### 1.按Key升序排序，使用TreeMap
+{% highlight java %}
+Map<Integer, Integer> map = new TreeMap<Integer, Integer>();
+{% endhighlight java %}
+
+### 2.按Key降序排序,修改TreeMap的排序方式
+{% highlight java %}
+Map< Integer,Integer> map=new HashMap<>();
+Comparator<Map.Entry<Integer, Integer>> valueComparator=new Comparator<Map.Entry<Integer,Integer>>() {
+  @Override
+  public int compare(Entry<Integer, Integer> arg0, Entry<Integer, Integer> arg1) {
+    return arg1.compareTo(arg0);
+  }
+};
+List<Map.Entry<Integer, Integer>> list=new ArrayList<Map.Entry<Integer,Integer>>(map.entrySet());
+Collections.sort(list,valueComparator);
+for(Map.Entry<Integer, Integer> entry:list) {
+  System.out.println(entry.getKey()+":"+entry.getValue());
+}
+{% endhighlight java %}
+
+### 3.按Value升序排序，修改TreeMap的排序方式
+{% highlight java %}
+Map< Integer,Integer> map=new HashMap<>();
+Comparator<Map.Entry<Integer, Integer>> valueComparator=new Comparator<Map.Entry<Integer,Integer>>() {
+  @Override
+  public int compare(Entry<Integer, Integer> arg0, Entry<Integer, Integer> arg1) {
+    return arg0.getValue()-arg1.getValue();
+  }
+};
+List<Map.Entry<Integer, Integer>> list=new ArrayList<Map.Entry<Integer,Integer>>(map.entrySet());
+Collections.sort(list,valueComparator);
+for(Map.Entry<Integer, Integer> entry:list) {
+  System.out.println(entry.getKey()+":"+entry.getValue());
+}
+{% endhighlight java %}
+
+### 4.按Value降序排序，同理(略)
